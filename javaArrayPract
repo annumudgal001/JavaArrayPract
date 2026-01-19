@@ -1,0 +1,338 @@
+# 📘 DSA Array & ArrayList Notes (Java)
+
+**Author:** Akshit  
+**Goal:** DSA mastery & interview preparation  
+**Language:** Java  
+
+---
+
+## 🔹 Topic 1: Linear Search (Easy)
+### Problem Statement
+Given an integer array `nums` and an integer `target`, return the index of `target`.  
+If the target does not exist, return `-1`.
+
+### Constraints
+- `1 ≤ nums.length ≤ 10^5`
+- `-10^9 ≤ nums[i], target ≤ 10^9`
+
+### Approach
+Traverse the array sequentially and compare each element with the target.
+
+### Time & Space Complexity
+- **Time:** `O(n)`
+- **Space:** `O(1)`
+
+```java
+class LinearSearch {
+    static int search(int[] arr, int target) {
+        if (arr == null || arr.length == 0) return -1;
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i] == target) return i;
+        }
+        return -1;
+    }
+}
+```
+
+## 🔹 Topic 2: Search in Range (Easy)
+### Problem Statement
+Given an integer array nums, search for a target element only within a given index range [lower, upper].  
+Return the index if found, otherwise return -1.
+
+### Constraints
+- `0 ≤ lower ≤ upper < nums.length`
+
+### Approach
+Apply linear search but restrict traversal to the given range.
+
+### Time & Space Complexity
+- **Time:** `O(n)`
+- **Space:** `O(1)`
+
+```java
+class SearchInRange {
+    static int search(int[] arr, int lower, int upper, int target) {
+        if (arr == null || lower < 0 || upper >= arr.length || lower > upper)
+            return -1;
+
+        for (int i = lower; i <= upper; i++) {
+            if (arr[i] == target) return i;
+        }
+        return -1;
+    }
+}
+```
+
+## 🔹 Topic 3: Search in String (Easy)
+### Problem Statement
+Given a string s and a character target, determine whether the character exists in the string.
+
+### Constraints
+- `1 ≤ s.length ≤ 10^5`
+
+### Approach
+Iterate through each character and compare it with the target.
+
+### Time & Space Complexity
+- **Time:** `O(n)`
+- **Space:** `O(1)`
+
+```java
+class SearchInString {
+    static boolean search(String str, char target) {
+        if (str == null) return false;
+
+        for (char ch : str.toCharArray()) {
+            if (ch == target) return true;
+        }
+        return false;
+    }
+}
+```
+
+## 🔹 Topic 4: Min & Max in Array (Easy)
+### Minimum Element in Array
+#### Problem Statement
+Given an integer array, return the minimum element.
+
+#### Approach
+Track the smallest value while traversing the array.
+
+#### Time & Space Complexity
+- **Time:** `O(n)`
+- **Space:** `O(1)`
+
+```java
+class MinInArray {
+    static int min(int[] arr) {
+        if (arr == null || arr.length == 0) return -1;
+
+        int min = arr[0];
+        for (int num : arr) {
+            if (num < min) min = num;
+        }
+        return min;
+    }
+}
+```
+
+### Index of Maximum Element
+#### Problem Statement
+Given an integer array, return the index of the maximum element.
+
+#### Approach
+Track the index of the largest value while iterating.
+
+#### Time & Space Complexity
+- **Time:** `O(n)`
+- **Space:** `O(1)`
+
+```java
+class MaxInArray {
+    static int maxIndex(int[] arr) {
+        if (arr == null || arr.length == 0) return -1;
+
+        int maxIndex = 0;
+        for (int i = 1; i < arr.length; i++) {
+            if (arr[i] > arr[maxIndex]) maxIndex = i;
+        }
+        return maxIndex;
+    }
+}
+```
+
+## 🔹 Topic 5: Array Manipulation (Easy)
+### Reverse an Array
+#### Problem Statement
+Reverse the given array in-place without using extra space.
+
+#### Approach
+Use two pointers from start and end, swapping elements.
+
+#### Time & Space Complexity
+- **Time:** `O(n)`
+- **Space:** `O(1)`
+
+```java
+class ReverseArray {
+    static void reverse(int[] arr) {
+        int start = 0, end = arr.length - 1;
+        while (start < end) {
+            int temp = arr[start];
+            arr[start++] = arr[end];
+            arr[end--] = temp;
+        }
+    }
+}
+```
+
+### Swap Two Elements
+#### Problem Statement
+Swap two elements at given indices in an array.
+
+```java
+class SwapElements {
+    static void swap(int[] arr, int i, int j) {
+        int temp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = temp;
+    }
+}
+```
+
+## 🔹 Topic 6: Binary Search (Easy → Medium)
+### Problem Statement
+Given a sorted array (ascending or descending), find the index of a target element using binary search.
+
+### Approach
+Detect sorting order, then apply binary search accordingly.
+
+### Time & Space Complexity
+- **Time:** `O(log n)`
+- **Space:** `O(1)`
+
+```java
+class BinarySearchCustom {
+    static int binarySearch(int[] arr, int target) {
+        int low = 0, high = arr.length - 1;
+        boolean isAsc = arr[low] < arr[high];
+
+        while (low <= high) {
+            int mid = low + (high - low) / 2;
+
+            if (arr[mid] == target) return mid;
+
+            if (isAsc) {
+                if (target < arr[mid]) high = mid - 1;
+                else low = mid + 1;
+            } else {
+                if (target > arr[mid]) high = mid - 1;
+                else low = mid + 1;
+            }
+        }
+        return -1;
+    }
+}
+```
+
+## 🔹 Topic 7: 2D Arrays (Medium)
+### Search in 2D Array
+#### Problem Statement
+Search for a target element in a jagged 2D array and return its position.
+
+```java
+class Search2DArray {
+    static int[] search(int[][] arr, int target) {
+        for (int i = 0; i < arr.length; i++) {
+            for (int j = 0; j < arr[i].length; j++) {
+                if (arr[i][j] == target)
+                    return new int[]{i, j};
+            }
+        }
+        return null;
+    }
+}
+```
+
+### Minimum Element Position in 2D Array
+
+```java
+class MinIn2DArray {
+    static int[] minPosition(int[][] arr) {
+        int min = Integer.MAX_VALUE;
+        int[] pos = new int[2];
+
+        for (int i = 0; i < arr.length; i++) {
+            for (int j = 0; j < arr[i].length; j++) {
+                if (arr[i][j] < min) {
+                    min = arr[i][j];
+                    pos[0] = i;
+                    pos[1] = j;
+                }
+            }
+        }
+        return pos;
+    }
+}
+```
+
+## 🔹 Topic 8: LeetCode Problems (Medium)
+### LeetCode 1295 – Find Numbers with Even Number of Digits
+
+```java
+class EvenDigitNumbers {
+    static int findNumbers(int[] nums) {
+        int count = 0;
+        for (int num : nums) {
+            if (digits(num) % 2 == 0) count++;
+        }
+        return count;
+    }
+
+    static int digits(int num) {
+        if (num == 0) return 1;
+        num = Math.abs(num);
+
+        int count = 0;
+        while (num > 0) {
+            num /= 10;
+            count++;
+        }
+        return count;
+    }
+}
+```
+
+### LeetCode 1672 – Richest Customer Wealth
+
+```java
+class RichestCustomerWealth {
+    static int maximumWealth(int[][] accounts) {
+        int max = 0;
+        for (int[] customer : accounts) {
+            int sum = 0;
+            for (int money : customer) sum += money;
+            max = Math.max(max, sum);
+        }
+        return max;
+    }
+}
+```
+
+## 🔹 Topic 9: ArrayList Basics (Easy)
+### Problem Statement
+Demonstrate basic operations on an ArrayList.
+
+```java
+class ArrayListExample {
+    static void demo() {
+        ArrayList<Long> list = new ArrayList<>();
+
+        list.add(12L);
+        list.add(12123456L);
+        list.add(121234567L);
+
+        list.remove(Long.valueOf(12123456L));
+
+        System.out.println(list);
+        System.out.println("Size: " + list.size());
+        System.out.println("Index: " + list.indexOf(121234567L));
+    }
+}
+```
+
+---
+
+### 📌 Final take
+This is:
+- **Interview-grade**
+- **Readable in 30 seconds**
+- **Expandable without refactoring**
+- Perfect for **GitHub, Notion, or revision notes**
+
+If you want, next we can:
+- Add **visual patterns mapping**
+- Create **revision flashcards**
+- Convert this into a **DSA roadmap README**
+
+Just say the word.
