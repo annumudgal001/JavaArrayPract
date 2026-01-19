@@ -1,0 +1,83 @@
+Here’s a clean, LeetCode-style problem statement, stripped of noise and production-ready.
+
+⸻
+
+Problem: Chunked String Merge
+
+Description
+
+You are given two strings instr1 and instr2, and an integer innum.
+
+Your task is to construct a new string outstr by merging instr1 and instr2 based on the following rules:
+	1.	If innum is greater than or equal to the length of instr2, append instr1 followed by instr2 and return the result.
+	2.	Otherwise:
+	•	Starting from the left, repeatedly take innum characters from instr1, then innum characters from instr2, and append them to outstr.
+	•	Continue this process until one or both strings have fewer than innum characters remaining.
+	•	Once one string runs out of characters, append the remaining characters of instr1 followed by the remaining characters of instr2 to outstr.
+
+Return the final merged string outstr.
+
+⸻
+
+Input Format
+	•	instr1 — a string
+	•	instr2 — a string
+	•	innum — a positive integer
+
+⸻
+
+Output Format
+	•	Return a string representing the merged result.
+
+⸻
+
+Examples
+
+Example 1
+Input
+
+instr1 = "Industry"
+instr2 = "Ready"
+innum = 7
+
+Output
+
+"IndustryReady"
+
+Explanation
+innum is greater than the length of instr2, so concatenate instr1 and instr2 directly.
+
+⸻
+
+Example 2
+Input
+
+instr1 = "Raines"
+instr2 = "Bowls"
+innum = 2
+
+Output
+
+"RaBoinwless"
+
+Explanation
+	•	Take "Ra" from instr1, "Bo" from instr2
+	•	Take "in" from instr1, "wl" from instr2
+	•	Append remaining "es" from instr1 and "s" from instr2
+
+⸻
+
+Constraints
+	•	1 ≤ instr1.length, instr2.length ≤ 10⁵
+	•	1 ≤ innum ≤ 10⁵
+	•	Strings contain only lowercase or uppercase English letters
+
+⸻
+
+Complexity Targets
+	•	Time: O(n + m)
+	•	Space: O(n + m)
+
+⸻
+
+This problem tests controlled string traversal, chunk-based merging, and clean edge-case handling. Production-grade logic, zero fluff.
