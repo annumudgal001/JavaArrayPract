@@ -1,0 +1,691 @@
+Understood. Going **full depth, enterprise-grade, no hand-holding**. This is a **one-stop internal playbook** for Java arrays: **concepts → edge cases → patterns → canonical code templates → interview-grade thinking**. Save this. Revisit it weekly.
+
+---
+
+# JAVA ARRAYS — DEEP DIVE MASTER REVISION (INTERVIEW + LEETCODE)
+
+---
+
+## 1. Arrays: The Truth, Not the Textbook
+
+### 1.1 What an Array Guarantees (and What It Doesn’t)
+
+**Guarantees**
+
+* O(1) random access
+* Contiguous memory
+* Deterministic performance
+* Cache-friendly
+
+**Does NOT Guarantee**
+
+* Dynamic resizing
+* Insert/delete efficiency
+* Safety from out-of-bounds
+* Thread safety
+
+If resizing or frequent inserts are required → **ArrayList exists for a reason**.
+
+---
+
+## 2. Array Creation — All Valid Forms
+
+```java
+int[] a = new int[5];
+int[] b = {1, 2, 3, 4};
+int[] c = new int[]{10, 20, 30};
+```
+
+Invalid:
+
+```java
+int[] d;
+d = {1, 2, 3}; // ❌
+```
+
+---
+
+## 3. Multi-Dimensional Arrays (Real Interview Angle)
+
+### 3.1 Standard Matrix
+
+```java
+int[][] mat = new int[3][4];
+```
+
+Memory:
+
+```
+mat → [ref][ref][ref]
+        ↓    ↓    ↓
+       row  row  row
+```
+
+### 3.2 Jagged Arrays
+
+```java
+int[][] jagged = new int[3][];
+jagged[0] = new int[2];
+jagged[1] = new int[5];
+```
+
+Interview trap: **Rows can have different lengths**
+
+---
+
+## 4. Traversal Templates (Memorize)
+
+### 4.1 Standard
+
+```java
+for (int i = 0; i < n; i++) {}
+```
+
+### 4.2 Reverse
+
+```java
+for (int i = n - 1; i >= 0; i--) {}
+```
+
+### 4.3 Enhanced For
+
+```java
+for (int x : arr) {}
+```
+
+⚠️ No index access
+
+---
+
+## 5. Core Array Operations — Code Library
+
+---
+
+### 5.1 Find Maximum & Minimum
+
+```java
+int max = arr[0], min = arr[0];
+for (int i = 1; i < arr.length; i++) {
+    if (arr[i] > max) max = arr[i];
+    if (arr[i] < min) min = arr[i];
+}
+```
+
+---
+
+### 5.2 Reverse an Array (Reusable Utility)
+
+```java
+static void reverse(int[] arr, int l, int r) {
+    while (l < r) {
+        int temp = arr[l];
+        arr[l++] = arr[r];
+        arr[r--] = temp;
+    }
+}
+```
+
+---
+
+### 5.3 Check Sorted (Increasing / Decreasing)
+
+```java
+boolean isSorted = true;
+for (int i = 1; i < n; i++) {
+    if (arr[i] < arr[i - 1]) {
+        isSorted = false;
+        break;
+    }
+}
+```
+
+---
+
+### 5.4 Remove Duplicates from Sorted Array (In-place)
+
+```java
+int k = 1;
+for (int i = 1; i < n; i++) {
+    if (arr[i] != arr[i - 1]) {
+        arr[k++] = arr[i];
+    }
+}
+```
+
+Result size = `k`
+
+---
+
+### 5.5 Left Rotate by One
+
+```java
+int temp = arr[0];
+for (int i = 1; i < n; i++)
+    arr[i - 1] = arr[i];
+arr[n - 1] = temp;
+```
+
+---
+
+### 5.6 Rotate by K (Optimal)
+
+```java
+k %= n;
+reverse(arr, 0, n - 1);
+reverse(arr, 0, k - 1);
+reverse(arr, k, n - 1);
+```
+
+---
+
+## 6. Two Pointer Pattern — Industrial Strength
+
+### 6.1 Move Zeros to End
+
+```java
+int idx = 0;
+for (int x : arr)
+    if (x != 0)
+        arr[idx++] = x;
+
+while (idx < n)
+    arr[idx++] = 0;
+```
+
+---
+
+### 6.2 Segregate Even & Odd
+
+```java
+int l = 0, r = n - 1;
+while (l < r) {
+    if (arr[l] % 2 == 0) l++;
+    else if (arr[r] % 2 == 1) r--;
+    else swap(arr, l++, r--);
+}
+```
+
+---
+
+## 7. Sliding Window — Non-Negotiable Pattern
+
+### 7.1 Max Sum Subarray of Size K
+
+```java
+int sum = 0, max = 0;
+for (int i = 0; i < k; i++) sum += arr[i];
+max = sum;
+
+for (int i = k; i < n; i++) {
+    sum += arr[i] - arr[i - k];
+    max = Math.max(max, sum);
+}
+```
+
+---
+
+### 7.2 Longest Subarray with Sum ≤ K (Positive Numbers)
+
+```java
+int l = 0, sum = 0, maxLen = 0;
+for (int r = 0; r < n; r++) {
+    sum += arr[r];
+    while (sum > k) sum -= arr[l++];
+    maxLen = Math.max(maxLen, r - l + 1);
+}
+```
+
+---
+
+## 8. Prefix Sum — Interview Power Move
+
+### 8.1 Prefix Array
+
+```java
+int[] prefix = new int[n];
+prefix[0] = arr[0];
+for (int i = 1; i < n; i++)
+    prefix[i] = prefix[i - 1] + arr[i];
+```
+
+---
+
+### 8.2 Subarray with Given Sum (Handles Negatives)
+
+```java
+Map<Integer, Integer> map = new HashMap<>();
+map.put(0, 1);
+int sum = 0, count = 0;
+
+for (int x : arr) {
+    sum += x;
+    count += map.getOrDefault(sum - k, 0);
+    map.put(sum, map.getOrDefault(sum, 0) + 1);
+}
+```
+
+---
+
+## 9. Kadane’s Algorithm (DP in Disguise)
+
+```java
+int curr = arr[0], max = arr[0];
+for (int i = 1; i < n; i++) {
+    curr = Math.max(arr[i], curr + arr[i]);
+    max = Math.max(max, curr);
+}
+```
+
+If this clicks → DP will click everywhere.
+
+---
+
+## 10. Hashing-Based Array Problems
+
+### 10.1 Two Sum
+
+```java
+Map<Integer, Integer> map = new HashMap<>();
+for (int i = 0; i < n; i++) {
+    int rem = target - arr[i];
+    if (map.containsKey(rem))
+        return new int[]{map.get(rem), i};
+    map.put(arr[i], i);
+}
+```
+
+---
+
+### 10.2 Frequency Count
+
+```java
+Map<Integer, Integer> freq = new HashMap<>();
+for (int x : arr)
+    freq.put(x, freq.getOrDefault(x, 0) + 1);
+```
+
+---
+
+## 11. Majority Element (Boyer–Moore)
+
+```java
+int count = 0, candidate = 0;
+for (int num : arr) {
+    if (count == 0) candidate = num;
+    count += (num == candidate) ? 1 : -1;
+}
+```
+
+Why it works: **Majority can’t be canceled fully**
+
+---
+
+## 12. Stock Buy & Sell (Greedy Core)
+
+```java
+int minPrice = Integer.MAX_VALUE;
+int maxProfit = 0;
+
+for (int price : prices) {
+    minPrice = Math.min(minPrice, price);
+    maxProfit = Math.max(maxProfit, price - minPrice);
+}
+```
+
+---
+
+## 13. Merge Two Sorted Arrays (Optimal)
+
+```java
+int i = m - 1, j = n - 1, k = m + n - 1;
+while (i >= 0 && j >= 0)
+    arr[k--] = (a[i] > b[j]) ? a[i--] : b[j--];
+
+while (j >= 0)
+    arr[k--] = b[j--];
+```
+
+---
+
+## 14. Missing & Repeating Numbers
+
+### 14.1 Missing (1 to N)
+
+```java
+int xor = 0;
+for (int i = 1; i <= n; i++) xor ^= i;
+for (int x : arr) xor ^= x;
+```
+
+---
+
+### 14.2 Duplicate (Floyd’s Cycle)
+
+```java
+int slow = arr[0], fast = arr[0];
+do {
+    slow = arr[slow];
+    fast = arr[arr[fast]];
+} while (slow != fast);
+
+slow = arr[0];
+while (slow != fast) {
+    slow = arr[slow];
+    fast = arr[fast];
+}
+```
+
+---
+
+## 15. How to THINK (This Is the Real Interview Weapon)
+
+### Decision Framework
+
+| Problem Type     | Pattern                      |
+| ---------------- | ---------------------------- |
+| Pair / Triplet   | Two pointer / Hash           |
+| Subarray         | Sliding window / Prefix      |
+| Max / Min        | Greedy                       |
+| Optimal in-place | Pointer compression          |
+| Repeating        | Hash / Cycle                 |
+| Sorted input     | Binary search / Two pointers |
+
+If constraints say **O(1) space**, hash is dead on arrival.
+
+---
+
+## 16. Final Non-Negotiables
+
+* Arrays are about **pattern recognition**
+* Code is secondary
+* Every problem reduces to:
+
+  * Pointer movement
+  * State maintenance
+  * Constraint exploitation
+
+---
+
+If you want next:
+
+* **Exact LeetCode mapping (Problem → Pattern → Template)**
+* **Blind 75 array-only crash path**
+* **Advanced 2D matrix problems**
+* **Custom array utility class (production-ready)**
+
+Pick the direction.
+Got it. **No rewrites, no dilution.** I’m **adding** on top of your existing internal playbook and closing the loop with an **execution-grade LeetCode mapping**.
+
+What follows is **exactly what interview-ready engineers use**:
+👉 *Problem → Pattern → Mental Trigger → Canonical Template*
+This is how you stop solving problems one-by-one and start **reusing brain cycles**.
+
+---
+
+# 🚀 EXACT LEETCODE MAPPING (70:30 EASY : MEDIUM)
+
+**20 problems total**
+
+* **14 Easy (foundation + speed)**
+* **6 Medium (pattern leverage + confidence)**
+
+---
+
+## 🟢 EASY (14) — NON-NEGOTIABLE BASE
+
+---
+
+### 1. Two Sum (LC 1)
+
+**Pattern:** Hashing
+**Trigger:** “Find pair with target”
+**Why:** Brute force dies at O(n²)
+
+**Template:**
+
+```java
+Map<Integer, Integer> map = new HashMap<>();
+for (int i = 0; i < n; i++) {
+    int need = target - arr[i];
+    if (map.containsKey(need)) return new int[]{map.get(need), i};
+    map.put(arr[i], i);
+}
+```
+
+---
+
+### 2. Best Time to Buy and Sell Stock (LC 121)
+
+**Pattern:** Greedy
+**Trigger:** “Max difference where buy < sell”
+
+```java
+int min = Integer.MAX_VALUE, profit = 0;
+for (int p : prices) {
+    min = Math.min(min, p);
+    profit = Math.max(profit, p - min);
+}
+```
+
+---
+
+### 3. Remove Duplicates from Sorted Array (LC 26)
+
+**Pattern:** Two pointers (compression)
+**Trigger:** “In-place, sorted input”
+
+```java
+int k = 1;
+for (int i = 1; i < n; i++)
+    if (arr[i] != arr[i - 1])
+        arr[k++] = arr[i];
+```
+
+---
+
+### 4. Move Zeroes (LC 283)
+
+**Pattern:** Write pointer
+**Trigger:** “Maintain order + in-place”
+
+```java
+int idx = 0;
+for (int x : arr)
+    if (x != 0) arr[idx++] = x;
+```
+
+---
+
+### 5. Maximum Subarray (LC 53)
+
+**Pattern:** Kadane (DP rolling)
+**Trigger:** “Largest contiguous sum”
+
+```java
+curr = Math.max(arr[i], curr + arr[i]);
+```
+
+---
+
+### 6. Majority Element (LC 169)
+
+**Pattern:** Boyer–Moore
+**Trigger:** “Element > n/2”
+
+```java
+if (count == 0) candidate = num;
+count += (num == candidate) ? 1 : -1;
+```
+
+---
+
+### 7. Missing Number (LC 268)
+
+**Pattern:** XOR / Math
+**Trigger:** “1 to N, one missing”
+
+```java
+xor ^= i; xor ^= arr[i];
+```
+
+---
+
+### 8. Contains Duplicate (LC 217)
+
+**Pattern:** HashSet
+**Trigger:** “Any repetition?”
+
+```java
+Set<Integer> set = new HashSet<>();
+```
+
+---
+
+### 9. Intersection of Two Arrays II (LC 350)
+
+**Pattern:** Hash frequency
+**Trigger:** “Count matters”
+
+---
+
+### 10. Plus One (LC 66)
+
+**Pattern:** Carry propagation
+**Trigger:** “Array as number”
+
+---
+
+### 11. Rotate Array (LC 189)
+
+**Pattern:** Reversal
+**Trigger:** “Rotate in-place”
+
+```java
+reverse → reverse → reverse
+```
+
+---
+
+### 12. Merge Sorted Array (LC 88)
+
+**Pattern:** Reverse two pointers
+**Trigger:** “Merge without extra space”
+
+---
+
+### 13. Find All Numbers Disappeared in an Array (LC 448)
+
+**Pattern:** Index marking
+**Trigger:** “1 ≤ a[i] ≤ n”
+
+```java
+int idx = Math.abs(arr[i]) - 1;
+arr[idx] = -Math.abs(arr[idx]);
+```
+
+---
+
+### 14. Squares of a Sorted Array (LC 977)
+
+**Pattern:** Two pointers
+**Trigger:** “Sorted but negative exists”
+
+---
+
+## 🟡 MEDIUM (6) — INTERVIEW DIFFERENTIATORS
+
+---
+
+### 15. Subarray Sum Equals K (LC 560)
+
+**Pattern:** Prefix Sum + HashMap
+**Trigger:** “Subarray + negatives”
+
+```java
+map.put(0, 1);
+count += map.get(sum - k);
+```
+
+---
+
+### 16. Longest Subarray with Sum K (LC GFG / Variants)
+
+**Pattern:** Prefix first occurrence
+**Trigger:** “Longest, not count”
+
+---
+
+### 17. Product of Array Except Self (LC 238)
+
+**Pattern:** Prefix × Suffix
+**Trigger:** “No division allowed”
+
+```java
+res[i] = left[i] * right[i];
+```
+
+---
+
+### 18. 3Sum (LC 15)
+
+**Pattern:** Sorting + Two pointers
+**Trigger:** “Triplets, avoid duplicates”
+
+```java
+for each i → l=i+1, r=n-1
+```
+
+---
+
+### 19. Container With Most Water (LC 11)
+
+**Pattern:** Two pointers + greedy
+**Trigger:** “Max area, width matters”
+
+```java
+Move smaller height pointer
+```
+
+---
+
+### 20. Find Duplicate Number (LC 287)
+
+**Pattern:** Floyd’s Cycle
+**Trigger:** “No extra space, read-only”
+
+```java
+slow = arr[slow];
+fast = arr[arr[fast]];
+```
+
+---
+
+## 🧠 MASTER PATTERN INDEX (USE THIS FIRST)
+
+| Pattern         | Problems It Solves         |
+| --------------- | -------------------------- |
+| Two Pointers    | 26, 283, 977, 11, 15       |
+| Sliding Window  | Fixed / Variable subarrays |
+| Prefix Sum      | 560, longest subarray      |
+| Greedy          | 121, 11                    |
+| Hashing         | 1, 217, 350                |
+| XOR             | 268                        |
+| Index Marking   | 448                        |
+| Cycle Detection | 287                        |
+| Reversal        | 189                        |
+
+---
+
+## 📌 HOW TO ACTUALLY THINK IN THE INTERVIEW
+
+**Before writing code, say this internally:**
+
+1. *Is input sorted?* → Two pointers / Binary search
+2. *Is it subarray?* → Sliding window or Prefix sum
+3. *Need max/min?* → Greedy
+4. *Need O(1) space?* → No HashMap
+5. *Constraints ≤ 10⁵?* → O(n) or you’re done
+
+If you don’t classify the problem in **60 seconds**, you’re improvising.
+
+---
