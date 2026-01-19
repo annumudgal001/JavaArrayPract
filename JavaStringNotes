@@ -1,0 +1,607 @@
+Below is a **high-density, interview-grade revision** of **Java String & StringBuilder**, optimized for **SDE interviews + LeetCode thinking**. No fluff. This is the mental model you’re expected to operate with.
+
+---
+
+# 1. Java String — Core Concepts (Know This Cold)
+
+## 1.1 Immutability (Non-Negotiable)
+
+* `String` is **immutable** → once created, **cannot be changed**
+* Any “modification” creates a **new object**
+* Reason:
+
+  * **String Pool safety**
+  * **Thread safety**
+  * **Security** (passwords, classloaders)
+  * **Hashing stability** (used as keys in `HashMap`)
+
+```java
+String s = "abc";
+s += "d";   // creates new String "abcd"
+```
+
+💡 **Interview takeaway**: If you modify strings in loops → you’re already losing.
+
+---
+
+## 1.2 String Pool (Very High Yield)
+
+* Literals go to **String Constant Pool (SCP)**
+* `new String("abc")` → **heap object + pool entry**
+
+```java
+String a = "abc";
+String b = "abc";              // same reference
+String c = new String("abc");  // different reference
+```
+
+* `==` → reference
+* `.equals()` → content
+
+```java
+a == b  // true
+a == c  // false
+a.equals(c) // true
+```
+
+---
+
+## 1.3 `intern()`
+
+* Returns canonical pooled version
+
+```java
+String x = new String("java").intern();
+```
+
+Used in memory-critical systems.
+
+---
+
+## 1.4 Time Complexity Reality Check
+
+* `length()` → O(1)
+* `charAt(i)` → O(1)
+* `substring()` → **O(n)** (since Java 7+ copies array)
+* `+` in loop → **O(n²)** disaster
+
+---
+
+# 2. String Methods — Must Memorize (Categorized)
+
+## 2.1 Character Access
+
+```java
+charAt(int i)
+toCharArray()
+getChars(int srcBegin, int srcEnd, char[] dst, int dstBegin)
+```
+
+---
+
+## 2.2 Comparison
+
+```java
+equals()
+equalsIgnoreCase()
+compareTo()              // lexicographic
+compareToIgnoreCase()
+contentEquals(CharSequence)
+```
+
+---
+
+## 2.3 Search
+
+```java
+indexOf(char / String)
+lastIndexOf()
+contains()
+startsWith()
+endsWith()
+matches(regex)
+```
+
+---
+
+## 2.4 Substrings & Splits
+
+```java
+substring(int begin)
+substring(int begin, int end)
+split(String regex)
+```
+
+⚠️ `split()` uses regex → costly → avoid in hot paths
+
+---
+
+## 2.5 Replace / Modify
+
+```java
+replace(char, char)
+replace(CharSequence, CharSequence)
+replaceAll(regex, replacement)
+replaceFirst(regex, replacement)
+```
+
+---
+
+## 2.6 Case & Trim
+
+```java
+toLowerCase()
+toUpperCase()
+trim()
+strip()        // Java 11, Unicode-aware
+```
+
+---
+
+## 2.7 Conversion
+
+```java
+valueOf(int / char[] / boolean)
+String.join(delimiter, iterable)
+format()
+```
+
+---
+
+# 3. StringBuilder — Performance Weapon
+
+## 3.1 Why It Exists
+
+* Mutable
+* No synchronization
+* Designed for **high-frequency modifications**
+
+```java
+StringBuilder sb = new StringBuilder();
+```
+
+---
+
+## 3.2 Key Properties
+
+* Initial capacity = 16
+* Grows via `(old * 2) + 2`
+* Amortized O(1) append
+
+---
+
+## 3.3 StringBuilder Methods (Interview Critical)
+
+### Modification
+
+```java
+append()
+insert(int offset, ...)
+delete(int start, int end)
+deleteCharAt(int index)
+replace(int start, int end, String)
+reverse()
+```
+
+### Access
+
+```java
+charAt()
+setCharAt()
+substring()
+length()
+capacity()
+```
+
+### Conversion
+
+```java
+toString()
+```
+
+---
+
+## 3.4 String vs StringBuilder Decision Matrix
+
+| Use Case            | Choice          |
+| ------------------- | --------------- |
+| Fixed value         | `String`        |
+| Loop concatenation  | `StringBuilder` |
+| Thread-safe mutable | `StringBuffer`  |
+| HashMap key         | `String`        |
+
+---
+
+# 4. 15 MOST IMPORTANT INTERVIEW + LEETCODE STRING QUESTIONS
+
+## Q1. Reverse a String
+
+**Pattern**: Two pointers
+
+**Thinking**:
+
+* Strings immutable → use char array or StringBuilder
+
+```java
+char[] arr = s.toCharArray();
+int l = 0, r = arr.length - 1;
+while (l < r) {
+    char t = arr[l];
+    arr[l++] = arr[r];
+    arr[r--] = t;
+}
+```
+
+---
+
+## Q2. Check Palindrome
+
+**Pattern**: Two pointers + ignore non-alphanumeric
+
+**Mental model**:
+
+* Shrink window
+* Normalize input
+
+---
+
+## Q3. Anagram Check
+
+**Pattern**: Frequency counting
+
+**Think**:
+
+* Same length
+* Same character counts
+
+```java
+int[] freq = new int[26];
+```
+
+---
+
+## Q4. Longest Substring Without Repeating Characters
+
+**Pattern**: Sliding window + HashMap
+
+**Thinking Framework**:
+
+* Expand right
+* If violation → shrink left
+
+---
+
+## Q5. String Compression (`aabcc → a2b1c2`)
+
+**Pattern**: Two pointers + StringBuilder
+
+---
+
+## Q6. Reverse Words in String
+
+**Pattern**:
+
+* Trim
+* Split OR manual scan
+* Reverse word order
+
+---
+
+## Q7. First Unique Character
+
+**Pattern**: Frequency + second pass
+
+---
+
+## Q8. Implement `strStr()` (Substring Search)
+
+**Pattern**:
+
+* Naive O(n*m)
+* KMP (follow-up)
+
+---
+
+## Q9. Longest Palindromic Substring
+
+**Pattern**: Expand around center
+
+**Think**:
+
+* Every index is a center
+* Handle even + odd
+
+---
+
+## Q10. Valid Parentheses
+
+**Pattern**: Stack + character mapping
+
+---
+
+## Q11. Count and Say
+
+**Pattern**:
+
+* Read previous string
+* Build next via StringBuilder
+
+---
+
+## Q12. Group Anagrams
+
+**Pattern**:
+
+* Sorted string OR frequency key
+* HashMap<String, List<String>>
+
+---
+
+## Q13. String to Integer (`atoi`)
+
+**Pattern**:
+
+* Trim
+* Sign
+* Overflow handling
+
+---
+
+## Q14. Longest Common Prefix
+
+**Pattern**:
+
+* Horizontal scan
+* Shrink prefix
+
+---
+
+## Q15. Decode String (`3[a2[c]]`)
+
+**Pattern**:
+
+* Stack for counts
+* Stack for strings
+
+---
+
+# 5. HOW TO THINK STRING PROBLEMS (THIS IS THE REAL VALUE)
+
+## Universal String Problem Playbook
+
+1. **Is modification required?**
+   → Use `StringBuilder` / char array
+
+2. **Is order preserved?**
+   → Two pointers / sliding window
+
+3. **Frequency involved?**
+   → Array (26 / 128 / 256) > HashMap
+
+4. **Substrings / window?**
+   → Sliding window
+
+5. **Nested / encoded structure?**
+   → Stack
+
+6. **Repeated building?**
+   → Never use `+`
+
+---
+
+# 6. Interview Red Flags (Instant Rejection Signals)
+
+* Using `String +` inside loop
+* Using `==` for string comparison
+* Ignoring Unicode
+* Using `split()` blindly
+* Not knowing immutability implications
+
+---
+
+## Bottom Line
+
+If you:
+
+* **Master String immutability**
+* **Default to StringBuilder**
+* **Recognize sliding window / two pointer patterns instantly**
+
+👉 You will clear **90% of string interview questions** without brute force.
+
+If you want:
+
+* **Code templates**
+* **KMP / Rabin-Karp deep dive**
+* **Top 30 LeetCode string drill list**
+
+Say the word.
+Understood. Below is the **same interview-grade list**, now **execution-ready**, with the **exact LeetCode URL under each problem**. Zero ambiguity. Bookmark this and run it like a sprint backlog.
+
+---
+
+# 🔹 14 EASY (Foundational — Non-Optional)
+
+---
+
+### 1. Valid Anagram — `LC 242`
+
+**Pattern**: Frequency counting
+**URL**:
+[https://leetcode.com/problems/valid-anagram/](https://leetcode.com/problems/valid-anagram/)
+
+---
+
+### 2. First Unique Character in a String — `LC 387`
+
+**Pattern**: Frequency + second pass
+**URL**:
+[https://leetcode.com/problems/first-unique-character-in-a-string/](https://leetcode.com/problems/first-unique-character-in-a-string/)
+
+---
+
+### 3. Valid Palindrome — `LC 125`
+
+**Pattern**: Two pointers + normalization
+**URL**:
+[https://leetcode.com/problems/valid-palindrome/](https://leetcode.com/problems/valid-palindrome/)
+
+---
+
+### 4. Reverse String — `LC 344`
+
+**Pattern**: Two pointers
+**URL**:
+[https://leetcode.com/problems/reverse-string/](https://leetcode.com/problems/reverse-string/)
+
+---
+
+### 5. Reverse Words in a String III — `LC 557`
+
+**Pattern**: Word-level reversal
+**URL**:
+[https://leetcode.com/problems/reverse-words-in-a-string-iii/](https://leetcode.com/problems/reverse-words-in-a-string-iii/)
+
+---
+
+### 6. Implement strStr() — `LC 28`
+
+**Pattern**: Substring search
+**URL**:
+[https://leetcode.com/problems/find-the-index-of-the-first-occurrence-in-a-string/](https://leetcode.com/problems/find-the-index-of-the-first-occurrence-in-a-string/)
+
+---
+
+### 7. Longest Common Prefix — `LC 14`
+
+**Pattern**: Prefix shrinking
+**URL**:
+[https://leetcode.com/problems/longest-common-prefix/](https://leetcode.com/problems/longest-common-prefix/)
+
+---
+
+### 8. Isomorphic Strings — `LC 205`
+
+**Pattern**: Bidirectional mapping
+**URL**:
+[https://leetcode.com/problems/isomorphic-strings/](https://leetcode.com/problems/isomorphic-strings/)
+
+---
+
+### 9. Valid Parentheses — `LC 20`
+
+**Pattern**: Stack
+**URL**:
+[https://leetcode.com/problems/valid-parentheses/](https://leetcode.com/problems/valid-parentheses/)
+
+---
+
+### 10. Check If Two String Arrays are Equivalent — `LC 1662`
+
+**Pattern**: Pointer merge
+**URL**:
+[https://leetcode.com/problems/check-if-two-string-arrays-are-equivalent/](https://leetcode.com/problems/check-if-two-string-arrays-are-equivalent/)
+
+---
+
+### 11. Add Strings — `LC 415`
+
+**Pattern**: Digit-by-digit addition
+**URL**:
+[https://leetcode.com/problems/add-strings/](https://leetcode.com/problems/add-strings/)
+
+---
+
+### 12. To Lower Case — `LC 709`
+
+**Pattern**: Character manipulation
+**URL**:
+[https://leetcode.com/problems/to-lower-case/](https://leetcode.com/problems/to-lower-case/)
+
+---
+
+### 13. Detect Capital — `LC 520`
+
+**Pattern**: Rule-based validation
+**URL**:
+[https://leetcode.com/problems/detect-capital/](https://leetcode.com/problems/detect-capital/)
+
+---
+
+### 14. Length of Last Word — `LC 58`
+
+**Pattern**: Reverse scan
+**URL**:
+[https://leetcode.com/problems/length-of-last-word/](https://leetcode.com/problems/length-of-last-word/)
+
+---
+
+# 🔹 6 HARD (High ROI — Interview Separators)
+
+---
+
+## 1. Longest Substring Without Repeating Characters — `LC 3`
+
+**Pattern**: Sliding window + HashMap
+**URL**:
+[https://leetcode.com/problems/longest-substring-without-repeating-characters/](https://leetcode.com/problems/longest-substring-without-repeating-characters/)
+
+---
+
+## 2. Longest Palindromic Substring — `LC 5`
+
+**Pattern**: Expand around center
+**URL**:
+[https://leetcode.com/problems/longest-palindromic-substring/](https://leetcode.com/problems/longest-palindromic-substring/)
+
+---
+
+## 3. Group Anagrams — `LC 49`
+
+**Pattern**: Hashing + canonical form
+**URL**:
+[https://leetcode.com/problems/group-anagrams/](https://leetcode.com/problems/group-anagrams/)
+
+---
+
+## 4. Decode String — `LC 394`
+
+**Pattern**: Stack (nested encoding)
+**URL**:
+[https://leetcode.com/problems/decode-string/](https://leetcode.com/problems/decode-string/)
+
+---
+
+## 5. Minimum Window Substring — `LC 76`
+
+**Pattern**: Sliding window + frequency map
+**URL**:
+[https://leetcode.com/problems/minimum-window-substring/](https://leetcode.com/problems/minimum-window-substring/)
+
+---
+
+## 6. Regular Expression Matching — `LC 10`
+
+**Pattern**: DP + recursion
+**URL**:
+[https://leetcode.com/problems/regular-expression-matching/](https://leetcode.com/problems/regular-expression-matching/)
+
+---
+
+## Final Directive (No Sugarcoating)
+
+If you:
+
+* Solve these **cleanly**
+* Can explain **why**, not just **how**
+* Can code them **without peeking**
+
+You are **string-ready for 90% of interviews**.
+
+If you want next:
+
+* **One unified thinking template per pattern**
+* **Java-optimized code skeletons**
+* **Company-tagged variants (Amazon / Google / Meta)**
+
+Say the word.
